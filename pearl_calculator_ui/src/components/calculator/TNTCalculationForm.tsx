@@ -82,13 +82,13 @@ export default function TNTCalculationForm({
 					<FieldLegend className="text-lg font-semibold">
 						{t("calculator.calculation_legend")}
 					</FieldLegend>
-					<FieldGroup className="grid grid-cols-2 gap-4">
+					<FieldGroup className="space-y-2">
 						<Field>
 							<FieldLabel htmlFor="pearl-x">
 								{t("calculator.label_pearl_x")}
 							</FieldLabel>
 							<BufferedNumberInput
-									id="pearl-x"
+								id="pearl-x"
 								placeholder="0.0"
 								value={inputs.pearlX}
 								onChange={(v) => onInputChange("pearlX", v)}
@@ -99,7 +99,7 @@ export default function TNTCalculationForm({
 								{t("calculator.label_pearl_z")}
 							</FieldLabel>
 							<BufferedNumberInput
-									id="pearl-z"
+								id="pearl-z"
 								placeholder="0.0"
 								value={inputs.pearlZ}
 								onChange={(v) => onInputChange("pearlZ", v)}
@@ -150,28 +150,25 @@ export default function TNTCalculationForm({
 								)}
 							</div>
 							<BufferedNumberInput
-									id="cannon-y"
+								id="cannon-y"
 								placeholder="36"
 								value={inputs.cannonY}
 								onChange={(v) => onInputChange("cannonY", v)}
 							/>
 						</Field>
 					</FieldGroup>
-					<FieldGroup
-						className="grid grid-cols-3 gap-4"
-					>
+					<FieldGroup className="space-y-2">
 						<Field>
 							<FieldLabel htmlFor="dest-x">
 								{t("calculator.label_dest_x")}
 							</FieldLabel>
 							<BufferedNumberInput
-									id="dest-x"
+								id="dest-x"
 								placeholder="0.0"
 								value={inputs.destX}
 								onChange={(v) => onInputChange("destX", v)}
 							/>
 						</Field>
-							<Field>
 						<Field>
 							<FieldLabel htmlFor="dest-y">
 								{t("calculator.label_dest_y", "Dest Y")}
@@ -183,11 +180,12 @@ export default function TNTCalculationForm({
 								onChange={(v) => onInputChange("destY", v)}
 							/>
 						</Field>
+						<Field>
 							<FieldLabel htmlFor="dest-z">
 								{t("calculator.label_dest_z")}
 							</FieldLabel>
 							<BufferedNumberInput
-									id="dest-z"
+								id="dest-z"
 								placeholder="0.0"
 								value={inputs.destZ}
 								onChange={(v) => onInputChange("destZ", v)}
