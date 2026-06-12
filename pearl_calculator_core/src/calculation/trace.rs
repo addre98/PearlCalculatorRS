@@ -64,60 +64,62 @@ pub fn validate_candidates(
                 plane_intercept_y,
             );
 
-            let mut results = Vec::new();
+            let flight = |pos: Space3D| pos - pearl_start_absolute_pos;
 
-            if let Some(best_hit) = hits.into_iter().min_by(|a, b| {
-                a.distance
-                    .partial_cmp(&b.distance)
-                    .unwrap()
-                    .then_with(|| a.tick.cmp(&b.tick))
-            }) {
-                let flight = best_hit.position - pearl_start_absolute_pos;
-                let h_dist = (flight.x.powi(2) + flight.z.powi(2)).sqrt();
-                let yaw = (-flight.x).atan2(flight.z).to_degrees();
-                let pitch = (-flight.y).atan2(h_dist).to_degrees();
-
-                let out_dir = calculation_direction;
-
-                results.push(TNTResult {
-                    distance: best_hit.distance,
-                    tick: best_hit.tick,
-                    blue: b_u32,
-                    red: r_u32,
-                    vertical: v_u32,
-                    total,
-                    pearl_end_pos: best_hit.position,
-                    pearl_end_motion: best_hit.motion,
-                    direction: out_dir,
-                    yaw,
-                    pitch,
-                });
-            }
-            results
+            hits.into_iter()
+                .map(|hit| {
+                    let f = flight(hit.position);
+                    let h_dist = (f.x.powi(2) + f.z.powi(2)).sqrt();
+                    let yaw = (-f.x).atan2(f.z).to_degrees();
+                    let pitch = (-f.y).atan2(h_dist).to_degrees();
+                    TNTResult {
+                        distance: hit.distance,
+                        tick: hit.tick,
+                        blue: b_u32,
+                        red: r_u32,
+                        vertical: v_u32,
+                        total,
+                        pearl_end_pos: hit.position,
+                        pearl_end_motion: hit.motion,
+                        direction: calculation_direction,
+                        yaw,
+                        pitch,
+                    }
+                })
+                .collect::<Vec<_>>()
         })
         .collect();
 
-    let mut best_map: HashMap<(u32, u32, u32), TNTResult> = HashMap::new();
+    // Pareto frontier per (red, blue, vertical): keep hits that
+    // aren't strictly worse than another in both distance AND Y
+    let mut groups: HashMap<(u32, u32, u32), Vec<TNTResult>> = HashMap::new();
     for res in raw_results {
-        let key = (res.red, res.blue, res.vertical);
-        match best_map.entry(key) {
-            std::collections::hash_map::Entry::Vacant(e) => {
-                e.insert(res);
-            }
-            std::collections::hash_map::Entry::Occupied(mut e) => {
-                let curr = e.get();
-                if (res.distance - curr.distance).abs() < FLOAT_PRECISION_EPSILON {
-                    if res.tick < curr.tick {
-                        e.insert(res);
-                    }
-                } else if res.distance < curr.distance {
-                    e.insert(res);
-                }
-            }
-        }
+        groups.entry((res.red, res.blue, res.vertical)).or_default().push(res);
     }
 
-    let mut final_results: Vec<TNTResult> = best_map.into_values().collect();
+    let mut final_results: Vec<TNTResult> = Vec::new();
+    for (_, mut group) in groups {
+        group.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
+        let mut kept: Vec<TNTResult> = Vec::new();
+        for hit in group {
+            let dominated = kept.iter().any(|k| {
+                k.distance <= hit.distance + FLOAT_PRECISION_EPSILON
+                    && k.pearl_end_pos.y <= hit.pearl_end_pos.y + FLOAT_PRECISION_EPSILON
+                    && (k.distance < hit.distance - FLOAT_PRECISION_EPSILON
+                        || k.pearl_end_pos.y < hit.pearl_end_pos.y - FLOAT_PRECISION_EPSILON)
+            });
+            if !dominated {
+                kept.retain(|k| {
+                    !(hit.distance <= k.distance + FLOAT_PRECISION_EPSILON
+                        && hit.pearl_end_pos.y <= k.pearl_end_pos.y + FLOAT_PRECISION_EPSILON
+                        && (hit.distance < k.distance - FLOAT_PRECISION_EPSILON
+                            || hit.pearl_end_pos.y < k.pearl_end_pos.y - FLOAT_PRECISION_EPSILON))
+                });
+                kept.push(hit);
+            }
+        }
+        final_results.extend(kept);
+    }
     final_results.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
     final_results
 }
