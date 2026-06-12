@@ -93,6 +93,25 @@ export default function AdvancedSettingsForm({
 								{t("calculator.suffix_blocks")}
 							</p>
 						</Field>
+						<Field>
+							<FieldLabel>{t("calculator.label_y_range")}</FieldLabel>
+							<div className="flex items-center gap-4">
+								<span className="text-sm text-muted-foreground w-8">0</span>
+								<Slider
+									value={inputs.yRange}
+									onValueChange={(v) => onInputChange("yRange", v)}
+									min={0}
+									max={320}
+									step={1}
+									className="flex-1"
+								/>
+								<span className="text-sm text-muted-foreground w-8">320</span>
+							</div>
+							<p className="mt-1 text-center text-sm text-muted-foreground">
+								{inputs.yRange[0]} -{" "}
+								{inputs.yRange[1]} Y
+							</p>
+						</Field>
 					</FieldGroup>
 				</FieldSet>
 			</div>

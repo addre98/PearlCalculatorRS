@@ -457,6 +457,7 @@ function CalculatorContent() {
 											results={calculationResults}
 											tickRange={inputs.tickRange}
 											distanceRange={inputs.distanceRange}
+											yRange={inputs.yRange}
 											onTrace={handlePearlTrace}
 										/>
 									</div>
@@ -549,6 +550,7 @@ function CalculatorContent() {
 												results={calculationResults}
 												tickRange={inputs.tickRange}
 												distanceRange={inputs.distanceRange}
+												yRange={inputs.yRange}
 												onTrace={handlePearlTrace}
 											/>
 										</motion.div>

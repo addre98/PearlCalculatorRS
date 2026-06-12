@@ -75,6 +75,7 @@
 			"advanced_settings_legend": "Advanced Settings",
 			"label_ticks_range": "Ticks Range",
 			"label_distance_range": "Distance Range (blocks)",
+	"label_y_range": "Pearl Y Range",
 			"suffix_ticks": "ticks",
 			"suffix_blocks": "blocks",
 			"cannon_y_tooltip": "The integer part of the cannon muzzle Y coordinate.",

@@ -11,6 +11,7 @@ interface RightPanelProps {
 	results: TNTResult[];
 	tickRange?: number[];
 	distanceRange?: number[];
+	yRange?: number[];
 	onTrace?: (
 		red: number,
 		blue: number,
@@ -23,6 +24,7 @@ export default function RightPanel({
 	results,
 	tickRange = [0, 10000],
 	distanceRange = [0, 1000],
+	yRange = [0, 255],
 	onTrace,
 }: RightPanelProps) {
 	const { t } = useTranslation();
@@ -33,9 +35,11 @@ export default function RightPanel({
 				result.tick >= tickRange[0] &&
 				result.tick <= tickRange[1] &&
 				result.distance >= distanceRange[0] &&
-				result.distance <= distanceRange[1],
+				result.distance <= distanceRange[1] &&
+				result.pearl_end_pos.Y >= yRange[0] &&
+				result.pearl_end_pos.Y <= yRange[1],
 		);
-	}, [results, tickRange, distanceRange]);
+	}, [results, tickRange, distanceRange, yRange]);
 
 	const tableData: CalculationResult[] = useMemo(() => {
 		return filteredResults.map((result, index) => ({
@@ -123,7 +127,7 @@ export default function RightPanel({
 					data={tableData}
 					onTrace={onTrace}
 					defaultColumnSizing={columnSizing}
-					getRowClassName={(row) => row.pearlY > 255 ? '!bg-red-50' : ''}
+					getRowClassName={(row) => row.pearlY > yRange[1] ? '!bg-red-50' : ''}
 				/>
 			</div>
 		</div>

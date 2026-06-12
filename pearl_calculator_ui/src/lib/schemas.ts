@@ -125,6 +125,7 @@ export const CalculatorInputsSchema = z.object({
 	cannonY: z.string(),
 	tickRange: z.array(z.number()),
 	distanceRange: z.array(z.number()),
+	yRange: z.array(z.number()),
 });
 
 export const MaskGroupSchema = z.object({

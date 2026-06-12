@@ -75,6 +75,7 @@
 			"advanced_settings_legend": "高级设置",
 			"label_ticks_range": "Tick 范围",
 			"label_distance_range": "距离范围（格）",
+	"label_y_range": "Y 高度范围",
 			"suffix_ticks": "tick",
 			"suffix_blocks": "格",
 			"cannon_y_tooltip": "炮口 Y 坐标（整数部分）",

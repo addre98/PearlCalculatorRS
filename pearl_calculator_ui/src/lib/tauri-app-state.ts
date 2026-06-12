@@ -140,6 +140,7 @@ const defaultCalculatorInputs: CalculatorInputs = {
 	cannonY: "36",
 	tickRange: [0, 20],
 	distanceRange: [0, 20],
+	yRange: [0, 255],
 };
 
 const defaultSimulatorConfig: SimulatorConfig = {
