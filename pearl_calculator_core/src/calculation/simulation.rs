@@ -316,10 +316,28 @@ fn measure_hit(
             });
     }
 
-    let dist_sq = if check_3d {
-        current_pos.distance_sq(&destination)
+    let dx = current_pos.x - previous_pos.x;
+    let dz = current_pos.z - previous_pos.z;
+    let denom = dx * dx + dz * dz;
+
+    let t = if denom.abs() < FLOAT_PRECISION_EPSILON {
+        0.0
     } else {
-        current_pos.distance_2d_sq(&destination)
+        let t0 =
+            ((destination.x - previous_pos.x) * dx + (destination.z - previous_pos.z) * dz) / denom;
+        t0.clamp(0.0, 1.0)
     };
-    Some((current_pos, dist_sq))
+
+    let hit = Space3D::new(
+        previous_pos.x + t * dx,
+        previous_pos.y + t * (current_pos.y - previous_pos.y),
+        previous_pos.z + t * dz,
+    );
+
+    let dist_sq = if check_3d {
+        hit.distance_sq(&destination)
+    } else {
+        hit.distance_2d_sq(&destination)
+    };
+    Some((hit, dist_sq))
 }
