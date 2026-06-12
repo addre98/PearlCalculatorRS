@@ -14,6 +14,8 @@ pub fn calculate_tnt_amount(
     max_distance: f64,
     version: PearlVersion,
     plane_intercept_y: bool,
+    y_min: f64,
+    y_max: f64,
 ) -> Vec<TNTResult> {
     let pearl_start_pos = cannon.pearl.position;
     let true_distance = destination - pearl_start_pos;
@@ -70,6 +72,8 @@ pub fn calculate_tnt_amount(
             version,
             flight_direction,
             max_ticks,
+            y_min,
+            y_max,
         );
 
         all_results.extend(results);

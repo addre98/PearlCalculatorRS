@@ -100,8 +100,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None, // max_vertical_tnt: None = no limit (only used in 3D mode)
         MAX_SIMULATION_TICKS,
         SEARCH_TOLERANCE_BLOCKS,
-        PearlVersion::Post1212, // Minecraft 1.21.2+ physics
+        PearlVersion::Post1212,
         false,
+        0.0,
+        255.0,
     );
 
     println!("   Time: {:.2?}", start_time.elapsed());

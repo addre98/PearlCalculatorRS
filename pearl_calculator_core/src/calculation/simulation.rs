@@ -109,37 +109,21 @@ pub fn scan_trajectory(
     max_distance_sq: f64,
     check_3d: bool,
     plane_intercept_y: bool,
+    y_min: f64,
+    y_max: f64,
 ) -> Vec<SimResult> {
     match version {
         PearlVersion::Legacy => scan_internal::<MovementLegacy>(
-            data,
-            destination,
-            max_tick,
-            valid_ticks,
-            world_collisions,
-            max_distance_sq,
-            check_3d,
-            plane_intercept_y,
+            data, destination, max_tick, valid_ticks, world_collisions,
+            max_distance_sq, check_3d, plane_intercept_y, y_min, y_max,
         ),
         PearlVersion::Post1205 => scan_internal::<MovementPost1205>(
-            data,
-            destination,
-            max_tick,
-            valid_ticks,
-            world_collisions,
-            max_distance_sq,
-            check_3d,
-            plane_intercept_y,
+            data, destination, max_tick, valid_ticks, world_collisions,
+            max_distance_sq, check_3d, plane_intercept_y, y_min, y_max,
         ),
         PearlVersion::Post1212 => scan_internal::<MovementPost1212>(
-            data,
-            destination,
-            max_tick,
-            valid_ticks,
-            world_collisions,
-            max_distance_sq,
-            check_3d,
-            plane_intercept_y,
+            data, destination, max_tick, valid_ticks, world_collisions,
+            max_distance_sq, check_3d, plane_intercept_y, y_min, y_max,
         ),
     }
 }
@@ -181,11 +165,13 @@ fn scan_internal<M: PearlMovement + Clone>(
     data: &GeneralData,
     destination: Space3D,
     max_tick: u32,
-    valid_ticks: &[bool],
+    _valid_ticks: &[bool],
     world_collisions: &[AABBBox],
     max_distance_sq: f64,
     check_3d: bool,
     plane_intercept_y: bool,
+    y_min: f64,
+    y_max: f64,
 ) -> Vec<SimResult> {
     let mut results = Vec::new();
     let mut pearl = PearlEntity::<M>::new(data.pearl_position, data.pearl_motion);
@@ -207,12 +193,14 @@ fn scan_internal<M: PearlMovement + Clone>(
 
         let current_pos = pearl.data.position;
 
-        if let Some((hit_pos, dist_sq)) = measure_hit(
+        for (hit_pos, dist_sq) in measure_hit(
             previous_pos,
             current_pos,
             destination,
             check_3d,
             plane_intercept_y,
+            y_min,
+            y_max,
         ) {
             if dist_sq <= max_distance_sq {
                 results.push(SimResult {
@@ -304,29 +292,48 @@ fn measure_hit(
     destination: Space3D,
     check_3d: bool,
     plane_intercept_y: bool,
-) -> Option<(Space3D, f64)> {
+    y_min: f64,
+    y_max: f64,
+) -> Vec<(Space3D, f64)> {
     if plane_intercept_y {
         return previous_pos
             .horizontal_plane_intersection(current_pos, destination.y)
             .map(|point| {
                 let dist_sq = point.distance_2d_sq(&destination);
-                (point, dist_sq)
-            });
+                vec![(point, dist_sq)]
+            })
+            .unwrap_or_default();
     }
 
-    let dist_prev_sq = if check_3d {
-        previous_pos.distance_sq(&destination)
-    } else {
-        previous_pos.distance_2d_sq(&destination)
-    };
-    let dist_curr_sq = if check_3d {
-        current_pos.distance_sq(&destination)
-    } else {
-        current_pos.distance_2d_sq(&destination)
-    };
-    if dist_prev_sq <= dist_curr_sq {
-        Some((previous_pos, dist_prev_sq))
-    } else {
-        Some((current_pos, dist_curr_sq))
+    let y_lo = previous_pos.y.min(current_pos.y);
+    let y_hi = previous_pos.y.max(current_pos.y);
+    let (dx, dy, dz) = (
+        current_pos.x - previous_pos.x,
+        current_pos.y - previous_pos.y,
+        current_pos.z - previous_pos.z,
+    );
+
+    let mut results = Vec::new();
+    let y_start = (y_lo.ceil() as i32).max(y_min as i32).min(y_max as i32);
+    let y_end = (y_hi.floor() as i32).max(y_min as i32).min(y_max as i32);
+
+    for y in y_start..=y_end {
+        let target_y = y as f64;
+        let t = if dy.abs() > FLOAT_PRECISION_EPSILON {
+            (target_y - previous_pos.y) / dy
+        } else {
+            0.5
+        };
+        if t < 0.0 || t > 1.0 {
+            continue;
+        }
+        let point = Space3D::new(
+            previous_pos.x + t * dx,
+            target_y,
+            previous_pos.z + t * dz,
+        );
+        let dist_sq = point.distance_2d_sq(&destination);
+        results.push((point, dist_sq));
     }
+    results
 }

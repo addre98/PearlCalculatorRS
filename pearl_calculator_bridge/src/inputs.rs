@@ -33,6 +33,9 @@ pub struct CalculationInput {
     #[serde(default)]
     pub plane_intercept_y: bool,
 
+    #[serde(default = "default_y_range")]
+    pub y_range: [u32; 2],
+
     pub max_tnt: u32,
     pub max_ticks: u32,
     pub max_distance: f64,
@@ -194,6 +197,10 @@ impl RawTraceInput {
     pub fn get_version(&self) -> Result<PearlVersion, String> {
         parse_version(&self.version)
     }
+}
+
+fn default_y_range() -> [u32; 2] {
+    [0, 255]
 }
 
 fn parse_version(s: &str) -> Result<PearlVersion, String> {

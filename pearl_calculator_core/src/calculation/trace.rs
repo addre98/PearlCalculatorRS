@@ -21,6 +21,8 @@ pub fn validate_candidates(
     version: PearlVersion,
     calculation_direction: Direction,
     max_ticks: u32,
+    y_min: f64,
+    y_max: f64,
 ) -> Vec<TNTResult> {
     let pearl_start_absolute_pos = pearl_position;
     let check_3d = plane_intercept_y || vert_vec.length_sq() > FLOAT_PRECISION_EPSILON;
@@ -56,6 +58,8 @@ pub fn validate_candidates(
                 max_distance_sq,
                 check_3d,
                 plane_intercept_y,
+                y_min,
+                y_max,
             );
 
             let flight = |pos: Space3D| pos - pearl_start_absolute_pos;

@@ -77,6 +77,7 @@ export function useTNTCalculator() {
 				destinationX: destX,
 				destinationY: parseFloat(inputs.destY ?? "") || 0,
 				planeInterceptY: inputs.planeInterceptY,
+				yRange: inputs.yRange ?? [0, 255],
 				destinationZ: destZ,
 				maxTnt: config.max_tnt,
 				maxVerticalTnt: maxVerticalTnt,

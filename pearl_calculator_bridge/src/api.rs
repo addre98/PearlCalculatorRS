@@ -12,6 +12,8 @@ pub fn calculate_tnt_amount(input: CalculationInput) -> Result<Vec<TNTResultOutp
     let cannon = input.get_cannon()?;
     let destination = input.get_destination();
     let origin = input.get_origin();
+    let y_min = input.y_range[0] as f64;
+    let y_max = input.y_range[1] as f64;
     let results = core_calculate_tnt_amount(
         &cannon,
         destination,
@@ -21,6 +23,8 @@ pub fn calculate_tnt_amount(input: CalculationInput) -> Result<Vec<TNTResultOutp
         input.max_distance,
         version,
         input.uses_plane_intercept_y(),
+        y_min,
+        y_max,
     );
 
     Ok(results
