@@ -24,7 +24,7 @@ export default function RightPanel({
 	results,
 	tickRange = [0, 10000],
 	distanceRange = [0, 1000],
-	yRange = [0, 999],
+	yRange = [0, 255],
 	onTrace,
 }: RightPanelProps) {
 	const { t } = useTranslation();

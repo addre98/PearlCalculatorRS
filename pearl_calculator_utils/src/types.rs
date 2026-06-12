@@ -231,7 +231,7 @@ pub const fn default_distance_range() -> [u32; 2] {
 }
 
 pub const fn default_y_range() -> [u32; 2] {
-    [0, 999]
+    [0, 255]
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]

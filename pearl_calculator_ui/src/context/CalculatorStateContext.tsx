@@ -64,7 +64,7 @@ const initialDefaultInputs: CalculatorInputs = {
 	cannonY: "36",
 	tickRange: [0, 100],
 	distanceRange: [0, 20],
-	yRange: [0, 999],
+	yRange: [0, 255],
 };
 
 export const emptyCalculatorInputs: CalculatorInputs = {
@@ -76,7 +76,7 @@ export const emptyCalculatorInputs: CalculatorInputs = {
 	cannonY: "0",
 	tickRange: [0, 100],
 	distanceRange: [0, 20],
-	yRange: [0, 999],
+	yRange: [0, 255],
 };
 
 export const emptySimulatorConfig: SimulatorConfig = {
