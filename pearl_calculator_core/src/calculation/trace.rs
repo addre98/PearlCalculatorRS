@@ -20,6 +20,7 @@ pub fn validate_candidates(
     plane_intercept_y: bool,
     version: PearlVersion,
     calculation_direction: Direction,
+    max_ticks: u32,
 ) -> Vec<TNTResult> {
     let pearl_start_absolute_pos = pearl_position;
     let check_3d = plane_intercept_y || vert_vec.length_sq() > FLOAT_PRECISION_EPSILON;
@@ -30,14 +31,8 @@ pub fn validate_candidates(
             ticks.sort_unstable();
             ticks.dedup();
 
-            let max_sim_tick = *ticks.last().unwrap_or(&0);
-            if max_sim_tick == 0 {
+            if *ticks.last().unwrap_or(&0) == 0 {
                 return Vec::new();
-            }
-
-            let mut valid_ticks_map = vec![false; (max_sim_tick + 1) as usize];
-            for &t in &ticks {
-                valid_ticks_map[t as usize] = true;
             }
 
             let total = r_u32 + b_u32 + v_u32;
@@ -54,8 +49,8 @@ pub fn validate_candidates(
             let hits = simulation::scan_trajectory(
                 &data,
                 destination,
-                max_sim_tick,
-                &valid_ticks_map,
+                max_ticks,
+                &[],
                 &[],
                 version,
                 max_distance_sq,

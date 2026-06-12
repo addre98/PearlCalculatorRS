@@ -69,6 +69,7 @@ pub fn calculate_tnt_amount(
             plane_intercept_y,
             version,
             flight_direction,
+            max_ticks,
         );
 
         all_results.extend(results);

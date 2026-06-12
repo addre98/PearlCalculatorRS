@@ -207,22 +207,20 @@ fn scan_internal<M: PearlMovement + Clone>(
 
         let current_pos = pearl.data.position;
 
-        if (tick as usize) < valid_ticks.len() && valid_ticks[tick as usize] {
-            if let Some((hit_pos, dist_sq)) = measure_hit(
-                previous_pos,
-                current_pos,
-                destination,
-                check_3d,
-                plane_intercept_y,
-            ) {
-                if dist_sq <= max_distance_sq {
-                    results.push(SimResult {
-                        tick,
-                        position: hit_pos,
-                        motion: pearl.data.motion,
-                        distance: dist_sq.sqrt(),
-                    });
-                }
+        if let Some((hit_pos, dist_sq)) = measure_hit(
+            previous_pos,
+            current_pos,
+            destination,
+            check_3d,
+            plane_intercept_y,
+        ) {
+            if dist_sq <= max_distance_sq {
+                results.push(SimResult {
+                    tick,
+                    position: hit_pos,
+                    motion: pearl.data.motion,
+                    distance: dist_sq.sqrt(),
+                });
             }
         }
 
