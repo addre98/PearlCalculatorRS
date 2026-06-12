@@ -69,7 +69,7 @@ pub fn validate_candidates(
             const Y_MAX: f64 = 255.0;
             const Y_PENALTY: f64 = 0.005;
 
-            fn score(hit: &SimResult) -> f64 {
+            fn score(hit: &simulation::SimResult) -> f64 {
                 hit.distance + f64::max(0.0, hit.position.y - Y_MAX) * Y_PENALTY
             }
 
