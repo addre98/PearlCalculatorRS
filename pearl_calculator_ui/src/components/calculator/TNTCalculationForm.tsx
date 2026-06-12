@@ -74,8 +74,6 @@ export default function TNTCalculationForm({
 	const { t } = useTranslation();
 	const { calculationMode } = useConfigurationState();
 	const showPlaneInterceptToggle = calculationMode !== "Vector3D";
-	const showDestY =
-		calculationMode === "Vector3D" ? true : inputs.planeInterceptY;
 
 	return (
 		<ScrollArea className="h-full">
@@ -160,7 +158,7 @@ export default function TNTCalculationForm({
 						</Field>
 					</FieldGroup>
 					<FieldGroup
-						className={`grid ${showDestY ? "grid-cols-3" : "grid-cols-2"} gap-4`}
+						className="grid grid-cols-3 gap-4"
 					>
 						<Field>
 							<FieldLabel htmlFor="dest-x">
@@ -173,20 +171,18 @@ export default function TNTCalculationForm({
 								onChange={(v) => onInputChange("destX", v)}
 							/>
 						</Field>
-						{showDestY && (
 							<Field>
-								<FieldLabel htmlFor="dest-y">
-									{t("calculator.label_dest_y", "Dest Y")}
-								</FieldLabel>
-								<BufferedNumberInput
-											id="dest-y"
-									placeholder="0.0"
-									value={inputs.destY || ""}
-									onChange={(v) => onInputChange("destY", v)}
-								/>
-							</Field>
-						)}
 						<Field>
+							<FieldLabel htmlFor="dest-y">
+								{t("calculator.label_dest_y", "Dest Y")}
+							</FieldLabel>
+							<BufferedNumberInput
+								id="dest-y"
+								placeholder="0.0"
+								value={inputs.destY || ""}
+								onChange={(v) => onInputChange("destY", v)}
+							/>
+						</Field>
 							<FieldLabel htmlFor="dest-z">
 								{t("calculator.label_dest_z")}
 							</FieldLabel>

@@ -75,11 +75,8 @@ export function useTNTCalculator() {
 				defaultRedDirection: config.default_red_tnt_position,
 				defaultBlueDirection: config.default_blue_tnt_position,
 				destinationX: destX,
-				destinationY:
-					(mode === "Vector3D" && inputs.destY) ||
-					(mode !== "Vector3D" && inputs.planeInterceptY && inputs.destY)
-						? parseFloat(inputs.destY ?? "") || 0
-						: undefined,
+				destinationY: parseFloat(inputs.destY ?? "") || 0,
+				planeInterceptY: inputs.planeInterceptY,
 				destinationZ: destZ,
 				maxTnt: config.max_tnt,
 				maxVerticalTnt: maxVerticalTnt,

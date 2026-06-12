@@ -30,6 +30,9 @@ pub struct CalculationInput {
     pub destination_y: Option<f64>,
     pub destination_z: f64,
 
+    #[serde(default)]
+    pub plane_intercept_y: bool,
+
     pub max_tnt: u32,
     pub max_ticks: u32,
     pub max_distance: f64,
@@ -76,7 +79,7 @@ impl CalculationInput {
     }
 
     pub fn uses_plane_intercept_y(&self) -> bool {
-        uses_plane_intercept_y(self.mode.as_deref(), self.destination_y)
+        self.plane_intercept_y && self.mode.as_deref() != Some("Vector3D")
     }
 }
 

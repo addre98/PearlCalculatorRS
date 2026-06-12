@@ -90,8 +90,14 @@ pub fn validate_candidates(
         })
         .collect();
 
+    let ideal_y = destination.y;
+
     // Pareto frontier per (red, blue, vertical): keep hits that
-    // aren't strictly worse than another in both distance AND Y
+    // aren't strictly worse than another in both distance AND |y_diff|
+    fn y_diff(hit: &TNTResult, ideal: f64) -> f64 {
+        (hit.pearl_end_pos.y - ideal).abs()
+    }
+
     let mut groups: HashMap<(u32, u32, u32), Vec<TNTResult>> = HashMap::new();
     for res in raw_results {
         groups.entry((res.red, res.blue, res.vertical)).or_default().push(res);
@@ -102,18 +108,21 @@ pub fn validate_candidates(
         group.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
         let mut kept: Vec<TNTResult> = Vec::new();
         for hit in group {
+            let yd = y_diff(&hit, ideal_y);
             let dominated = kept.iter().any(|k| {
+                let kd = y_diff(k, ideal_y);
                 k.distance <= hit.distance + FLOAT_PRECISION_EPSILON
-                    && k.pearl_end_pos.y <= hit.pearl_end_pos.y + FLOAT_PRECISION_EPSILON
+                    && kd <= yd + FLOAT_PRECISION_EPSILON
                     && (k.distance < hit.distance - FLOAT_PRECISION_EPSILON
-                        || k.pearl_end_pos.y < hit.pearl_end_pos.y - FLOAT_PRECISION_EPSILON)
+                        || kd < yd - FLOAT_PRECISION_EPSILON)
             });
             if !dominated {
                 kept.retain(|k| {
+                    let kd = y_diff(k, ideal_y);
                     !(hit.distance <= k.distance + FLOAT_PRECISION_EPSILON
-                        && hit.pearl_end_pos.y <= k.pearl_end_pos.y + FLOAT_PRECISION_EPSILON
+                        && yd <= kd + FLOAT_PRECISION_EPSILON
                         && (hit.distance < k.distance - FLOAT_PRECISION_EPSILON
-                            || hit.pearl_end_pos.y < k.pearl_end_pos.y - FLOAT_PRECISION_EPSILON))
+                            || yd < kd - FLOAT_PRECISION_EPSILON))
                 });
                 kept.push(hit);
             }
