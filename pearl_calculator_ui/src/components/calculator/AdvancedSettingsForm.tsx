@@ -98,18 +98,18 @@ export default function AdvancedSettingsForm({
 							<div className="flex items-center gap-4">
 								<span className="text-sm text-muted-foreground w-8">0</span>
 								<Slider
-									value={inputs.yRange ?? [0, 320]}
+									value={inputs.yRange ?? [0, 999]}
 									onValueChange={(v) => onInputChange("yRange", v)}
 									min={0}
-									max={320}
+									max={999}
 									step={1}
 									className="flex-1"
 								/>
-								<span className="text-sm text-muted-foreground w-8">320</span>
+								<span className="text-sm text-muted-foreground w-8">999</span>
 							</div>
 							<p className="mt-1 text-center text-sm text-muted-foreground">
-								{(inputs.yRange ?? [0, 320])[0]} -{" "}
-								{(inputs.yRange ?? [0, 320])[1]} Y
+								{(inputs.yRange ?? [0, 999])[0]} -{" "}
+								{(inputs.yRange ?? [0, 999])[1]} Y
 							</p>
 						</Field>
 					</FieldGroup>

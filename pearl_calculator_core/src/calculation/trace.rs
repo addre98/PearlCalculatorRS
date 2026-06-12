@@ -66,16 +66,9 @@ pub fn validate_candidates(
 
             let mut results = Vec::new();
 
-            const Y_MAX: f64 = 255.0;
-            const Y_PENALTY: f64 = 0.005;
-
-            fn score(hit: &simulation::SimResult) -> f64 {
-                hit.distance + f64::max(0.0, hit.position.y - Y_MAX) * Y_PENALTY
-            }
-
             if let Some(best_hit) = hits.into_iter().min_by(|a, b| {
-                score(a)
-                    .partial_cmp(&score(b))
+                a.distance
+                    .partial_cmp(&b.distance)
                     .unwrap()
                     .then_with(|| a.tick.cmp(&b.tick))
             }) {
