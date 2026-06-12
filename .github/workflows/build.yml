@@ -38,15 +38,9 @@ jobs:
           VERSION=$(grep -A1 '^name = "wasm-bindgen"$' Cargo.lock | grep '^version' | head -1 | cut -d'"' -f2)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
-        id: wbg-cache
+      - uses: taiki-e/install-action@v2
         with:
-          path: ~/.cargo/bin/wasm-bindgen*
-          key: wasm-bindgen-${{ runner.os }}-${{ steps.wbg.outputs.VERSION }}
-
-      - name: Install wasm-bindgen-cli
-        if: steps.wbg-cache.outputs.cache-hit != 'true'
-        run: cargo install wasm-bindgen-cli --version "${{ steps.wbg.outputs.VERSION }}"
+          tool: wasm-bindgen@${{ steps.wbg.outputs.VERSION }}
 
       - name: Install Frontend Dependencies
         working-directory: pearl_calculator_ui
