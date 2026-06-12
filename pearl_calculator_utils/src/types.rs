@@ -201,6 +201,8 @@ pub struct CalculatorInputs {
     pub tick_range: [u32; 2],
     #[serde(default = "default_distance_range")]
     pub distance_range: [u32; 2],
+    #[serde(default = "default_y_range")]
+    pub y_range: [u32; 2],
 }
 
 impl Default for CalculatorInputs {
@@ -215,16 +217,21 @@ impl Default for CalculatorInputs {
             cannon_y: "36".to_string(),
             tick_range: default_tick_range(),
             distance_range: default_distance_range(),
+            y_range: default_y_range(),
         }
     }
 }
 
 pub const fn default_tick_range() -> [u32; 2] {
-    [0, 20]
+    [0, 100]
 }
 
 pub const fn default_distance_range() -> [u32; 2] {
     [0, 20]
+}
+
+pub const fn default_y_range() -> [u32; 2] {
+    [0, 320]
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]

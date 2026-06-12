@@ -138,7 +138,7 @@ const defaultCalculatorInputs: CalculatorInputs = {
 	planeInterceptY: false,
 	destZ: "",
 	cannonY: "36",
-	tickRange: [0, 20],
+	tickRange: [0, 100],
 	distanceRange: [0, 20],
 	yRange: [0, 320],
 };

@@ -311,6 +311,7 @@ pub enum CalculatorInputField {
     CannonY,
     TickRange,
     DistanceRange,
+    YRange,
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -569,6 +570,11 @@ fn apply_calculator_input_update(
         CalculatorInputField::DistanceRange => {
             if let Some(range) = parse_range(&value) {
                 inputs.distance_range = range;
+            }
+        }
+        CalculatorInputField::YRange => {
+            if let Some(range) = parse_range(&value) {
+                inputs.y_range = range;
             }
         }
     }
