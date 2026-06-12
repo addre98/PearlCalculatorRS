@@ -7,7 +7,6 @@ use crate::physics::entities::movement::PearlVersion;
 use crate::physics::world::direction::Direction;
 use crate::physics::world::space::Space3D;
 use crate::utils::parallel::*;
-use std::collections::HashMap;
 
 pub fn validate_candidates(
     candidates: Vec<((u32, u32, u32), Vec<u32>)>,
@@ -66,69 +65,31 @@ pub fn validate_candidates(
 
             let flight = |pos: Space3D| pos - pearl_start_absolute_pos;
 
-            hits.into_iter()
-                .map(|hit| {
-                    let f = flight(hit.position);
-                    let h_dist = (f.x.powi(2) + f.z.powi(2)).sqrt();
-                    let yaw = (-f.x).atan2(f.z).to_degrees();
-                    let pitch = (-f.y).atan2(h_dist).to_degrees();
-                    TNTResult {
-                        distance: hit.distance,
-                        tick: hit.tick,
-                        blue: b_u32,
-                        red: r_u32,
-                        vertical: v_u32,
-                        total,
-                        pearl_end_pos: hit.position,
-                        pearl_end_motion: hit.motion,
-                        direction: calculation_direction,
-                        yaw,
-                        pitch,
-                    }
-                })
-                .collect::<Vec<_>>()
+            let mut results = Vec::new();
+            for hit in hits {
+                let f = flight(hit.position);
+                let h_dist = (f.x.powi(2) + f.z.powi(2)).sqrt();
+                let yaw = (-f.x).atan2(f.z).to_degrees();
+                let pitch = (-f.y).atan2(h_dist).to_degrees();
+                results.push(TNTResult {
+                    distance: hit.distance,
+                    tick: hit.tick,
+                    blue: b_u32,
+                    red: r_u32,
+                    vertical: v_u32,
+                    total,
+                    pearl_end_pos: hit.position,
+                    pearl_end_motion: hit.motion,
+                    direction: calculation_direction,
+                    yaw,
+                    pitch,
+                });
+            }
+            results
         })
         .collect();
 
-    let ideal_y = destination.y;
-
-    // Pareto frontier per (red, blue, vertical): keep hits that
-    // aren't strictly worse than another in both distance AND |y_diff|
-    fn y_diff(hit: &TNTResult, ideal: f64) -> f64 {
-        (hit.pearl_end_pos.y - ideal).abs()
-    }
-
-    let mut groups: HashMap<(u32, u32, u32), Vec<TNTResult>> = HashMap::new();
-    for res in raw_results {
-        groups.entry((res.red, res.blue, res.vertical)).or_default().push(res);
-    }
-
-    let mut final_results: Vec<TNTResult> = Vec::new();
-    for (_, mut group) in groups {
-        group.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
-        let mut kept: Vec<TNTResult> = Vec::new();
-        for hit in group {
-            let yd = y_diff(&hit, ideal_y);
-            let dominated = kept.iter().any(|k| {
-                let kd = y_diff(k, ideal_y);
-                k.distance <= hit.distance + FLOAT_PRECISION_EPSILON
-                    && kd <= yd + FLOAT_PRECISION_EPSILON
-                    && (k.distance < hit.distance - FLOAT_PRECISION_EPSILON
-                        || kd < yd - FLOAT_PRECISION_EPSILON)
-            });
-            if !dominated {
-                kept.retain(|k| {
-                    let kd = y_diff(k, ideal_y);
-                    !(hit.distance <= k.distance + FLOAT_PRECISION_EPSILON
-                        && yd <= kd + FLOAT_PRECISION_EPSILON
-                        && (hit.distance < k.distance - FLOAT_PRECISION_EPSILON
-                            || yd < kd - FLOAT_PRECISION_EPSILON))
-                });
-                kept.push(hit);
-            }
-        }
-        final_results.extend(kept);
-    }
+    let mut final_results: Vec<TNTResult> = raw_results;
     final_results.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
     final_results
 }
