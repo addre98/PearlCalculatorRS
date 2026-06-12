@@ -1,0 +1,69 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [ "main", "claude/**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc,wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            pearl_calculator_ui/src-tauri
+
+      - name: Get wasm-bindgen version
+        id: wbg
+        shell: bash
+        run: |
+          VERSION=$(grep -A1 '^name = "wasm-bindgen"$' Cargo.lock | grep '^version' | head -1 | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        id: wbg-cache
+        with:
+          path: ~/.cargo/bin/wasm-bindgen*
+          key: wasm-bindgen-${{ runner.os }}-${{ steps.wbg.outputs.VERSION }}
+
+      - name: Install wasm-bindgen-cli
+        if: steps.wbg-cache.outputs.cache-hit != 'true'
+        run: cargo install wasm-bindgen-cli --version "${{ steps.wbg.outputs.VERSION }}"
+
+      - name: Install Frontend Dependencies
+        working-directory: pearl_calculator_ui
+        run: pnpm install
+
+      - name: Build WASM
+        run: |
+          cargo build -p pearl_calculator_wasm --target wasm32-unknown-unknown --release
+          wasm-bindgen target/wasm32-unknown-unknown/release/pearl_calculator_wasm.wasm --out-dir pearl_calculator_wasm/pkg --target bundler
+
+      - name: Build Tauri App
+        working-directory: pearl_calculator_ui
+        run: pnpm tauri build
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: PearlCalculatorRS-windows
+          path: |
+            target/release/bundle/nsis/*.exe
+            target/release/pearl_calculator_ui.exe
