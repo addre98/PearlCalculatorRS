@@ -46,11 +46,6 @@ jobs:
         working-directory: pearl_calculator_ui
         run: pnpm install
 
-      - name: Build WASM
-        run: |
-          cargo build -p pearl_calculator_wasm --target wasm32-unknown-unknown --release
-          wasm-bindgen target/wasm32-unknown-unknown/release/pearl_calculator_wasm.wasm --out-dir pearl_calculator_wasm/pkg --target bundler
-
       - name: Build Tauri App
         working-directory: pearl_calculator_ui
         run: pnpm tauri build
