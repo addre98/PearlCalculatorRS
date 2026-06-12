@@ -290,7 +290,7 @@ fn measure_hit(
     previous_pos: Space3D,
     current_pos: Space3D,
     destination: Space3D,
-    check_3d: bool,
+    _check_3d: bool,
     plane_intercept_y: bool,
     y_min: f64,
     y_max: f64,

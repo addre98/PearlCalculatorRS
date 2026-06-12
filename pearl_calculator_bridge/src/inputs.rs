@@ -212,9 +212,6 @@ fn parse_version(s: &str) -> Result<PearlVersion, String> {
     }
 }
 
-fn uses_plane_intercept_y(mode: Option<&str>, destination_y: Option<f64>) -> bool {
-    matches!(destination_y, Some(_)) && !matches!(mode, Some("Vector3D"))
-}
 
 fn parse_layout_direction(s: &str) -> Option<LayoutDirection> {
     match s {
